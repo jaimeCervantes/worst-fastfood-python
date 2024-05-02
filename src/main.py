@@ -1,34 +1,20 @@
 from typing import Union
 from fastapi import FastAPI, Depends, HTTPException, Form
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi.middleware.cors import CORSMiddleware
 from .password_hashing import verify_password
 from .token_api import verify_jwt_token, generate_jwt_token
 from .faked_users import users
 from .createDataFrame import createDataFrame
+from .addCorsMiddleware import addCorsMiddleware
 import json
 
 
-origins = [
-    "http://localhost",
-    "http://localhost:5173"
-]
 
 app = FastAPI()
+addCorsMiddleware(app)
 
 bearer_scheme = HTTPBearer()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["GET", "POST"],
-    allow_headers=["*"],
-)
-
-
 df = createDataFrame("data/fastfood.csv")
-
 @app.get("/fastfood-nutrition")
 def protected_route(authorization: HTTPAuthorizationCredentials = Depends(bearer_scheme), food_name: Union[str, None] = None):
     token = authorization.credentials
