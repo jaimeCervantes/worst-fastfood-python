@@ -1,15 +1,31 @@
 from typing import Union
 from fastapi import FastAPI, Depends, HTTPException, Form
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.middleware.cors import CORSMiddleware
 from .password_hashing import verify_password
 from .token_api import verify_jwt_token, generate_jwt_token
 from .faked_users import users
 from .createDataFrame import createDataFrame
 import json
 
+
+origins = [
+    "http://localhost",
+    "http://localhost:5173"
+]
+
 app = FastAPI()
 
 bearer_scheme = HTTPBearer()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
+
 
 df = createDataFrame("data/fastfood.csv")
 
